@@ -1,0 +1,40 @@
+AICISS MOTION SCENARIOS
+-------------------------
+
+### Description
+The idea of this node is to provide some default motion scenarios for the
+robot (youBot) to follow. This behaviour is implemented as a Client - Service
+architecture, within a simple State Machine. The user client can input
+selections to switch states in the SM and select different motion scenearios.
+
+Usage (Terminal Client)
+------------------------
+
+* Make sure ROS is running.
+* Run the server.
+* Run the client.
+* Select the motion scenario (1, 2...)
+
+* roscore
+* rosrun aiciss_motion_scenarios motion_scenarios_server.py
+* rosrun aiciss_motion_scenarios motion_scenarios_client.py
+
+User Input:
+(1) Scenario 1: Follow a square
+(2) Scenario 2: Follow a circle
+(3) Scenario 3: Follow a triangle
+(4) Exit.
+(Anything else) Scenario 1: Follow a square
+
+Usage (Browser Client)
+-----------------------
+* Make sure ROS is running.
+* Make sure ROS Bridge is running.
+* Run the server.
+* Open the script 'remote_control.html' on a browser.
+* Select the motion scenario (1, 2...)
+
+* roscore
+* roslaunch rosbridge_server rosbridge_websocket.launch
+* rosrun aiciss_motion_scenarios motion_scenarios_server.py
+* open aiciss_motion_scenarios/scripts/remote_control.html

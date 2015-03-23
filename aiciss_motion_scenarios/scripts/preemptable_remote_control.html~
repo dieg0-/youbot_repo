@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+
+
+ /*
+  Create ROS node to communicate with a rosbridge server.
+  Connect localhost to default port 9090.
+ */
+ var ros = new ROSLIB.Ros({
+    url : 'ws://localhost:9090'
+ });
+
+ // Add listener for Connection event to ROS object.
+ ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+ });
+
+ // Add listener for Error event to ROS object.
+ ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+ });
+
+ // Add listener for Close event to ROS object.
+ ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+ });
+
+ /* Topic declaration for cmd_vel commands */
+   var cmdVel = new ROSLIB.Topic({
+    ros : ros,
+    name : '/cmd_vel',
+    messageType : 'geometry_msgs/Twist'
+   });
+
+ /* Service declaration for motion scenario selection */  
+  var selectScenarioClient = new ROSLIB.ActionClient({
+    ros : ros,
+    name : '/as',
+    actionName : 'motion_scenarios/motion_scenariosAction'
+  });
+  
+  /* Service declaration for killer service */
+  var killerClient = new ROSLIB.Service({
+    ros : ros,
+    name : '/killer_service',
+    serviceType : 'motion_scenarios/TestSrv'
+  });
+
+ /* Sends a cmd_vel (publishes) command according to received parameters */
+ function newCmdMsg(xl, yl, zl, xa, ya, za){
+
+  var twist = new ROSLIB.Message({
+    linear : {
+      x : xl,
+      y : yl,
+      z : zl
+    },
+    angular : {
+      x : xa,
+      y : ya,
+      z : za
+    }
+  });
+  cmdVel.publish(twist);
+ }
+
+ /* Sends ZERO linear and angular velocities to stop motion */
+ function stop(){
+
+  var twist = new ROSLIB.Message({
+    linear : {
+      x : 0.0,
+      y : 0.0,
+      z : 0.0
+    },
+    angular : {
+      x : 0.0,
+      y : 0.0,
+      z : 0.0
+    }
+  });
+  cmdVel.publish(twist);
+ }
+
+ /* Reads user inputs and sends a cmd_vel command accordingly */
+ function doCmdMsg() {
+    var xLElement = document.getElementById("xLinear");
+    var xL = parseFloat(xLElement.value);
+
+    var yLElement = document.getElementById("yLinear");
+    var yL = parseFloat(yLElement.value);
+
+    var zLElement = document.getElementById("zLinear");
+    var zL = parseFloat(zLElement.value);
+
+    var xAElement = document.getElementById("xAngular");
+    var xA = parseFloat(xAElement.value);
+
+    var yAElement = document.getElementById("yAngular");
+    var yA = parseFloat(yAElement.value);
+
+    var zAElement = document.getElementById("zAngular");
+    var zA = parseFloat(zAElement.value);
+
+    newCmdMsg(xL, yL, zL, xA, yA, zA);
+ }
+ 
+ function scenarioRequest(selection){
+   //var selectionInput = document.getElementById("scenario");
+   //var selection = parseInt(selectionInput.value);
+   
+   var goal = new ROSLIB.Goal({
+    actionClient : fibonacciClient,
+    goalMessage : {
+      order : selection
+    }
+  });
+
+  goal.on('feedback', function(feedback) {
+    console.log('Feedback: ' + feedback.sequence);
+  });
+
+  goal.on('result', function(result) {
+    console.log('Final Result: ' + result.sequence);
+  });
+   var request = new ROSLIB.ServiceRequest({
+     a : selection
+   });
+  
+  selectScenarioClient.callService(request, function(result) {
+    console.log('Result for service call on '
+      + selectScenarioClient.name
+      + ': '
+      + result.s);
+  });
+ }
+ 
+ function killRequest(selection){
+   //var selectionInput = document.getElementById("scenario");
+   //var selection = parseInt(selectionInput.value);
+   
+   var request = new ROSLIB.ServiceRequest({
+     a : selection
+   });
+  
+  killerClient.callService(request, function(result) {
+    console.log('Result for service call on '
+      + killerClient.name
+      + ': '
+      + result.s);
+  });
+ }
+
+
+</script>
+</head>
+
+<body>
+ <h1>AICISS Remote Control</h1>
+ <h2>Testing ROS - JavaScript</h2>
+ 
+ <!-- This is just a test -->
+ <button onclick="myFunction()">Click!!</button><br><br>
+ <p id="test"></p>
+
+ <hr style="border:none;border-top:1px solid #666;border-bottom:1px solid #ccc;" />
+ <h3>Velocity Commands</h3>
+ <!-- User Input for the linear velocities -->
+ Linear: <br>
+  X: <input id ="xLinear" type="text" size="5">
+  Y: <input id ="yLinear" type="text" size="5">
+  Z: <input id ="zLinear" type="text" size="5"><br><br> 
+
+ <!-- User Input for the angular velocities -->
+ Angular: <br>
+  X: <input id ="xAngular" type="text" size="5">
+  Y: <input id ="yAngular" type="text" size="5">
+  Z: <input id ="zAngular" type="text" size="5"><br><br>
+ 
+ <input type = "button" value = "Send Command" onClick = "doCmdMsg()">
+ <button onclick="stop()">STOP!!</button><br><br>
+
+<hr style="border:none;border-top:1px solid #666;border-bottom:1px solid #ccc;" />
+
+ <h3>Default Motion Scenarios</h3>
+ <!-- User Input for the motion scenario selection -->
+ INPUTS: <br>
+  1: (Square) <br>
+  2: (Circle) <br>
+  3: (Triangle) <br>
+  4: (Cancel) <br><br>
+  <button onclick="scenarioRequest(1)">1</button>
+  <button onclick="scenarioRequest(2)">2</button>
+  <button onclick="scenarioRequest(3)">3</button>
+  <button onclick="scenarioRequest(4)">PAUSE</button>
+  <button onclick="scenarioRequest(5)">FINISH</button>
+
+ <script>
+ 
+ /* This is just a test */
+ function myFunction() {
+    document.getElementById("test").innerHTML = "Welcome.. Start sending commands now!";
+ }
+ </script>
+
+
+
+</body>
+
+</html>

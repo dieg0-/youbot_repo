@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/ros-pkg/!svn/ver/35401/stacks/executive_smach_tutorials/trunk/smach_tutorials
+END
+mainpage.dox
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/ros-pkg/!svn/ver/31390/stacks/executive_smach_tutorials/trunk/smach_tutorials/mainpage.dox
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/ros-pkg/!svn/ver/31390/stacks/executive_smach_tutorials/trunk/smach_tutorials/CMakeLists.txt
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/ros-pkg/!svn/ver/31390/stacks/executive_smach_tutorials/trunk/smach_tutorials/Makefile
+END
+manifest.xml
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/ros-pkg/!svn/ver/31397/stacks/executive_smach_tutorials/trunk/smach_tutorials/manifest.xml
+END
